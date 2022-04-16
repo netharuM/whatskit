@@ -600,7 +600,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "833b70ad78b2ed195e2a771347810242d669f5ff"
+      resolved-ref: dbd0655fbeee71328b70399e134ac682d5d4c961
       url: "https://github.com/netharuM/video_trimmer.git"
     source: git
     version: "1.1.1"

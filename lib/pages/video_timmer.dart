@@ -176,8 +176,8 @@ class _TrimPreviewsState extends State<TrimPreviews> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             if (_exportedVids == null) {
-              List<String> videoPaths = [];
               setState(() {
+                _exportedVids = [];
                 _sharingState = SharingState.rendering;
               });
               for (Map<String, Duration> trimmedVid in _trimmedVids!) {
@@ -190,15 +190,24 @@ class _TrimPreviewsState extends State<TrimPreviews> {
                     outputFormat: FileFormat.mp4,
                     storageDir: StorageDir.externalStorageDirectory,
                     addToEndOfOutPutPath:
-                        '${_trimmedVids!.indexOf(trimmedVid)}');
-                videoPaths.add(outPutPath!);
+                        '${_trimmedVids!.indexOf(trimmedVid)}',
+                    ignoreRC: true);
                 trimmer.dispose();
+                if (outPutPath == null) {
+                  setState(() {
+                    _sharingState = SharingState.none;
+                  });
+                  debugPrint('error ------ happend while rendering');
+                  return;
+                }
+                setState(() {
+                  _exportedVids!.add(outPutPath);
+                });
               }
               setState(() {
-                _exportedVids = videoPaths;
                 _sharingState = SharingState.sharing;
               });
-              await Share.shareFiles(videoPaths);
+              await Share.shareFiles(_exportedVids!);
             } else {
               setState(() {
                 _sharingState = SharingState.sharing;
@@ -236,7 +245,7 @@ class _TrimPreviewsState extends State<TrimPreviews> {
               ),
               Text(
                 _sharingState == SharingState.rendering
-                    ? 'rendering...'
+                    ? 'rendering ${_exportedVids!.length} of ${_trimmedVids!.length}'
                     : 'sharing...',
                 style: const TextStyle(
                   fontSize: 24,
