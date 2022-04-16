@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:flutter/material.dart';
-import 'package:whatskit/pages/preview_page.dart';
+import 'package:whatskit/pages/status_preview_page.dart';
 
 class WhatsappStatusCard extends StatelessWidget {
   final FileSystemEntity file;
@@ -45,31 +45,41 @@ class WhatsappStatusCard extends StatelessWidget {
   }
 }
 
-class PreviewFile extends StatelessWidget {
+class PreviewFile extends StatefulWidget {
   final File file;
   const PreviewFile({Key? key, required this.file}) : super(key: key);
 
   @override
+  State<PreviewFile> createState() => _PreviewFileState();
+}
+
+class _PreviewFileState extends State<PreviewFile> {
+  Uint8List? _thumbnail;
+
+  Future<Uint8List?> get getVidThumbNail async =>
+      _thumbnail ??= await VideoThumbnail.thumbnailData(
+        video: widget.file.path,
+        imageFormat: ImageFormat.JPEG,
+        quality: 50,
+      );
+
+  @override
   Widget build(BuildContext context) {
-    if (file.path.endsWith('.jpg')) {
+    if (widget.file.path.endsWith('.jpg')) {
       return Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image.file(
-            File(file.path),
+            File(widget.file.path),
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
           ),
         ),
       );
-    } else if (file.path.endsWith('.mp4')) {
+    } else if (widget.file.path.endsWith('.mp4')) {
       return FutureBuilder(
-        future: VideoThumbnail.thumbnailData(
-          video: file.path,
-          imageFormat: ImageFormat.JPEG,
-          quality: 50,
-        ),
+        future: getVidThumbNail,
         builder: (context, AsyncSnapshot<Uint8List?> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Stack(
@@ -107,7 +117,7 @@ class PreviewFile extends StatelessWidget {
       );
     } else {
       return Text(
-        file.path,
+        widget.file.path,
         style: const TextStyle(color: Colors.white),
       );
     }

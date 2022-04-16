@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:whatskit/pages/statuses_page.dart';
+import 'package:whatskit/pages/video_timmer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,12 +16,61 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: generateMaterialColorFromColor(const Color(0xff00a884)),
         scaffoldBackgroundColor: const Color(0xff111b21),
+        backgroundColor: const Color(0xff111b21),
         cardColor: const Color(0xff202c33),
         primaryColor: const Color(0xff00a884),
         textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.white),
-        iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.white),
+        iconTheme: Theme.of(context)
+            .iconTheme
+            .copyWith(color: const Color(0xff00a884)),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: const Color(0xff202c33),
+          selectedItemColor: const Color(0xff00a884),
+          unselectedItemColor: Colors.white.withOpacity(0.5),
+        ),
       ),
-      home: const StatusesPage(),
+      home: const App(),
+    );
+  }
+}
+
+class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  int _pageIndex = 0;
+
+  final List<Widget> _pages = [
+    const StatusesPage(),
+    const VideoTrimmerPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_pageIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.video_collection),
+            label: 'statuses',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.cut_rounded),
+            label: 'trimmer',
+          ),
+        ],
+        currentIndex: _pageIndex,
+        onTap: (int index) {
+          setState(() {
+            _pageIndex = index;
+          });
+        },
+      ),
     );
   }
 }

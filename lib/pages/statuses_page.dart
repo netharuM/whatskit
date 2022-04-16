@@ -43,9 +43,6 @@ class _StatusesPageState extends State<StatusesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('whatsapp status'),
-      ),
       body: RefreshIndicator(
         onRefresh: _init,
         child: GridView.count(
@@ -59,39 +56,6 @@ class _StatusesPageState extends State<StatusesPage> {
                 ),
               ),
           ],
-        ),
-      ),
-      drawer: Drawer(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(12),
-                bottomRight: Radius.circular(12)),
-            color: Theme.of(context).scaffoldBackgroundColor,
-          ),
-          child: ListView(
-            children: [
-              DrawerHeader(
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/icon.png',
-                      width: 100,
-                    ),
-                    Text(
-                      'whatskit',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

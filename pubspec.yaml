@@ -38,6 +38,9 @@ dependencies:
     video_player: ^2.3.0
     share_plus: ^4.0.4
     filesystem_picker: ^2.0.0
+    image_picker: ^0.8.5
+    video_trimmer:
+        git: https://github.com/netharuM/video_trimmer.git
 
 dev_dependencies:
     flutter_test:
