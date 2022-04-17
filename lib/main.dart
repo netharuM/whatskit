@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whatskit/pages/settings_page.dart';
 import 'package:whatskit/pages/statuses_page.dart';
 import 'package:whatskit/pages/video_timmer.dart';
 
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
           selectedItemColor: const Color(0xff00a884),
           unselectedItemColor: Colors.white.withOpacity(0.5),
         ),
+        dividerColor: Colors.white,
       ),
       home: const App(),
     );
@@ -42,34 +44,53 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  int _pageIndex = 0;
-
-  final List<Widget> _pages = [
-    const StatusesPage(),
-    const VideoTrimmerPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_pageIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.video_collection),
-            label: 'statuses',
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.cut_rounded),
-            label: 'trimmer',
+          child: TabBar(
+            indicatorColor: Theme.of(context).primaryColor,
+            tabs: [
+              Tab(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.video_collection_rounded),
+                      SizedBox(width: 8),
+                      Text('statuses'),
+                    ]),
+              ),
+              Tab(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.cut),
+                      SizedBox(width: 8),
+                      Text('trimmer'),
+                    ]),
+              ),
+              Tab(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.settings),
+                      SizedBox(width: 8),
+                      Text('settings'),
+                    ]),
+              ),
+            ],
           ),
-        ],
-        currentIndex: _pageIndex,
-        onTap: (int index) {
-          setState(() {
-            _pageIndex = index;
-          });
-        },
+        ),
+        body: const TabBarView(children: [
+          StatusesPage(),
+          VideoTrimmerPage(),
+          SettingsPage(),
+        ]),
       ),
     );
   }

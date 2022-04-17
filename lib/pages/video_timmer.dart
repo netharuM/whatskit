@@ -245,7 +245,7 @@ class _TrimPreviewsState extends State<TrimPreviews> {
               ),
               Text(
                 _sharingState == SharingState.rendering
-                    ? 'rendering ${_exportedVids!.length} of ${_trimmedVids!.length}'
+                    ? 'rendering ${_exportedVids!.length + 1} of ${_trimmedVids!.length}'
                     : 'sharing...',
                 style: const TextStyle(
                   fontSize: 24,

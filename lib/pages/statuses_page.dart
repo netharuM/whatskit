@@ -44,6 +44,7 @@ class _StatusesPageState extends State<StatusesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
+        backgroundColor: Theme.of(context).cardColor,
         onRefresh: _init,
         child: GridView.count(
           crossAxisCount: 2,

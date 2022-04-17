@@ -1,5 +1,6 @@
 name: whatskit
 description: toolkit for whatsapp.
+repository: https://github.com/netharuM/whatskit
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -15,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.2+2
+version: 1.0.3+1
 
 environment:
     sdk: ">=2.16.2 <3.0.0"
@@ -41,6 +42,8 @@ dependencies:
     image_picker: ^0.8.5
     video_trimmer:
         git: https://github.com/netharuM/video_trimmer.git
+    package_info_plus: ^1.4.2
+    url_launcher: ^6.0.20
 
 dev_dependencies:
     flutter_test:
