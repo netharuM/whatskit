@@ -44,7 +44,7 @@ class _StatusesPageState extends State<StatusesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
-        backgroundColor: Theme.of(context).cardColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         onRefresh: _init,
         child: GridView.count(
           crossAxisCount: 2,
@@ -53,6 +53,7 @@ class _StatusesPageState extends State<StatusesPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: WhatsappStatusCard(
+                  elevation: 10,
                   file: _statusFiles[i],
                 ),
               ),

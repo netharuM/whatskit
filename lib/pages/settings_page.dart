@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:whatskit/provider/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -13,72 +15,100 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
+    final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Theme.of(context).cardColor,
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.all(12),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(40),
+      child: ListView(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(12),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              elevation: 5,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Theme.of(context).cardColor,
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: const Icon(
+                        Icons.settings,
+                        size: 85,
+                        color: Colors.white,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.settings,
-                      size: 85,
-                      color: Colors.white,
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Settings',
+                      style: TextStyle(fontSize: 24),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Settings',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            const Divider(),
-            SettingsOption(
-              title: 'Clear rendered cache',
-              subtitle:
-                  'clears the rendered videos cache \npls dont clear it while sharing a video',
-              iconColor: Colors.pink,
-              icon: Icons.cleaning_services_rounded,
-              onTap: () async {
-                var renderedCacheDir = Directory(
-                    '/storage/emulated/0/Android/data/com.netharuM.whatskit/files/Trimmer');
-                if (await renderedCacheDir.exists()) {
-                  await renderedCacheDir.delete(recursive: true);
-                }
-              },
-            ),
-            const Divider(),
-            SettingsOption(
-              title: 'About',
-              subtitle: 'about the app',
-              iconColor: Colors.blue,
-              icon: Icons.info_outline,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AboutPage(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+          ),
+          const Divider(),
+          SettingsOption(
+            title: 'Clear rendered cache',
+            subtitle:
+                'clears the rendered videos cache \npls dont clear it while sharing a video',
+            iconColor: Colors.pink,
+            icon: Icons.cleaning_services_rounded,
+            onTap: () async {
+              var renderedCacheDir = Directory(
+                  '/storage/emulated/0/Android/data/com.netharuM.whatskit/files/Trimmer');
+              if (await renderedCacheDir.exists()) {
+                await renderedCacheDir.delete(recursive: true);
+              }
+            },
+          ),
+          SettingsOption(
+            title: 'Theme',
+            subtitle: themeProvider.toString(),
+            icon: themeProvider.getThemeMode == ThemeMode.system
+                ? Icons.android
+                : (themeProvider.getThemeMode == ThemeMode.dark
+                    ? Icons.dark_mode
+                    : Icons.light_mode),
+            onTap: () {
+              switch (themeProvider.getThemeMode) {
+                case ThemeMode.dark:
+                  themeProvider.changeThemeMode(ThemeMode.light);
+                  break;
+                case ThemeMode.light:
+                  themeProvider.changeThemeMode(ThemeMode.system);
+                  break;
+                case ThemeMode.system:
+                  themeProvider.changeThemeMode(ThemeMode.dark);
+                  break;
+              }
+            },
+          ),
+          const Divider(),
+          SettingsOption(
+            title: 'About',
+            subtitle: 'about the app',
+            iconColor: Colors.blue,
+            icon: Icons.info_outline,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AboutPage(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -90,54 +120,57 @@ class SettingsOption extends StatelessWidget {
   final Color? iconColor;
   final IconData? icon;
   final VoidCallback? onTap;
+  final EdgeInsets? padding;
+
   const SettingsOption(
       {Key? key,
       required this.title,
       required this.subtitle,
       this.iconColor,
       this.onTap,
-      this.icon})
+      this.icon,
+      this.padding})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+    return Padding(
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 8.0),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(color: Colors.white.withOpacity(0.8)),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Visibility(
-              visible: icon != null,
-              child: Icon(
-                icon,
-                size: 30,
-                color: iconColor,
-              ),
-            )
-          ],
+              Visibility(
+                visible: icon != null,
+                child: Icon(
+                  icon,
+                  size: 30,
+                  color: iconColor,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -176,31 +209,38 @@ class _AboutPageState extends State<AboutPage> {
         children: [
           Container(
             margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).cardColor,
-            ),
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: const Icon(
-                    Icons.info,
-                    size: 85,
-                    color: Colors.white,
-                  ),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              elevation: 5,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Theme.of(context).cardColor,
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'About',
-                  style: TextStyle(fontSize: 24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: const Icon(
+                        Icons.info,
+                        size: 85,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'About',
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           const Divider(),
@@ -273,6 +313,20 @@ class _AboutPageState extends State<AboutPage> {
               }
             },
           ),
+          AboutCard(
+            title: 'Report a bug',
+            subtitle:
+                'report an issue you found on this app \nor suggest a new feature',
+            icon: const Icon(Icons.bug_report_rounded),
+            onTap: () async {
+              const url = 'https://github.com/netharuM/whatskit/issues/new';
+              if (await canLaunch(url)) {
+                await launch(url);
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+          ),
         ],
       ),
     );
@@ -311,17 +365,12 @@ class AboutCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title ?? '',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
+                    Text(title ?? '',
+                        style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 4),
                     Text(
                       subtitle ?? '',
-                      style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
                 ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:whatskit/pages/settings_page.dart';
 import 'package:whatskit/pages/statuses_page.dart';
 import 'package:whatskit/pages/video_timmer.dart';
+import 'package:whatskit/provider/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,26 +14,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: generateMaterialColorFromColor(const Color(0xff00a884)),
-        scaffoldBackgroundColor: const Color(0xff111b21),
-        backgroundColor: const Color(0xff111b21),
-        cardColor: const Color(0xff202c33),
-        primaryColor: const Color(0xff00a884),
-        textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.white),
-        iconTheme: Theme.of(context)
-            .iconTheme
-            .copyWith(color: const Color(0xff00a884)),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: const Color(0xff202c33),
-          selectedItemColor: const Color(0xff00a884),
-          unselectedItemColor: Colors.white.withOpacity(0.5),
-        ),
-        dividerColor: Colors.white,
-      ),
-      home: const App(),
+    return ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      builder: (context, _) {
+        final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+        return MaterialApp(
+          title: 'Flutter Demo',
+          themeMode: themeProvider.getThemeMode,
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+          home: const App(),
+        );
+      },
     );
   }
 }
@@ -51,7 +45,7 @@ class _AppState extends State<App> {
       child: Scaffold(
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: Theme.of(context).backgroundColor,
           ),
           child: TabBar(
             indicatorColor: Theme.of(context).primaryColor,

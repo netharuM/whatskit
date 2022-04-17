@@ -49,9 +49,7 @@ class _VideoTrimmerPageState extends State<VideoTrimmerPage> {
                       ),
                       Text(
                         'Tap to select a video',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                        ),
+                        style: Theme.of(context).textTheme.labelLarge,
                       ),
                     ],
                   ),
@@ -274,32 +272,39 @@ class TrimmedVidCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TrimmedVideoPage(
-              start: start,
-              end: end,
-              video: video,
+    return Container(
+      margin: const EdgeInsets.all(8),
+      child: Material(
+        color: Colors.transparent,
+        elevation: 5,
+        borderRadius: BorderRadius.circular(12),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TrimmedVideoPage(
+                  start: start,
+                  end: end,
+                  video: video,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Icon(Icons.video_collection_sharp),
+                Text('${start.inSeconds}s - ${end.inSeconds}s'),
+              ],
             ),
           ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Icon(Icons.video_collection_sharp),
-            Text('${start.inSeconds}s - ${end.inSeconds}s'),
-          ],
         ),
       ),
     );

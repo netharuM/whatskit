@@ -6,40 +6,46 @@ import 'package:whatskit/pages/status_preview_page.dart';
 
 class WhatsappStatusCard extends StatelessWidget {
   final FileSystemEntity file;
-  const WhatsappStatusCard({Key? key, required this.file}) : super(key: key);
+  final double elevation;
+  const WhatsappStatusCard({Key? key, required this.file, this.elevation = 0})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        color: Theme.of(context).cardColor,
-      ),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: PreviewFile(
-              file: File(file.path),
-            ),
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (builder) => PreviewPage(
-                      file: File(file.path),
-                    ),
-                  ),
-                );
-              },
+    return Material(
+      elevation: elevation,
+      color: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Theme.of(context).cardColor,
+        ),
+        child: Stack(
+          children: [
+            ClipRRect(
               borderRadius: BorderRadius.circular(12),
+              child: PreviewFile(
+                file: File(file.path),
+              ),
             ),
-          ),
-        ],
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => PreviewPage(
+                        file: File(file.path),
+                      ),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
