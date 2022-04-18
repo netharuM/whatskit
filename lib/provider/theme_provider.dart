@@ -6,7 +6,7 @@ class ThemeProvider extends ChangeNotifier {
     _init();
   }
 
-  ThemeMode themeMode = ThemeMode.dark;
+  ThemeMode themeMode = ThemeMode.system;
   late final SharedPreferences _prefs;
 
   void _init() async {
