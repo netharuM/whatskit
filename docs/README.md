@@ -1,5 +1,7 @@
 # whatskit
 
+![logo](./assets/icon.png)
+
 a toolkit for whatsapp including
 
 - whatsapp status downloader
