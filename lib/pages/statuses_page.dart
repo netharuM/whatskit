@@ -2,6 +2,46 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:whatskit/widgets/status_card.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+
+class Permissions {
+  late AndroidDeviceInfo _androidDeviceInfo;
+  int? androidVersion;
+
+  Permissions() {
+    _init();
+  }
+
+  Future<bool> get isGranted async {
+    if (androidVersion == null) {
+      _androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
+      androidVersion = int.parse(_androidDeviceInfo.version.release ?? '0');
+    }
+    if (androidVersion! < 11) {
+      return true;
+    } else {
+      return await Permission.manageExternalStorage.isGranted;
+    }
+  }
+
+  Future<PermissionStatus> requestIfNotFound() async {
+    if (await isGranted == false) {
+      return await requestPermission();
+    } else {
+      return PermissionStatus.granted;
+    }
+  }
+
+  Future<PermissionStatus> requestPermission() async {
+    return await Permission.manageExternalStorage.request();
+  }
+
+  Future<void> _init() async {
+    _androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
+    androidVersion = int.parse(_androidDeviceInfo.version.release ?? '0');
+    requestIfNotFound();
+  }
+}
 
 class StatusesPage extends StatefulWidget {
   const StatusesPage({Key? key}) : super(key: key);
@@ -14,6 +54,7 @@ class _StatusesPageState extends State<StatusesPage> {
   bool? isWhatsappInstalled;
   bool? isPermissionGranted;
   List<FileSystemEntity> _statusFiles = [];
+  final Permissions _permissions = Permissions();
 
   Future<List<FileSystemEntity>> getFileList() async {
     Directory dir = Directory(
@@ -31,10 +72,7 @@ class _StatusesPageState extends State<StatusesPage> {
   }
 
   Future<void> _init() async {
-    isPermissionGranted = await Permission.manageExternalStorage.isGranted;
-    if (!isPermissionGranted!) {
-      await Permission.manageExternalStorage.request();
-    }
+    isPermissionGranted = await _permissions.isGranted;
 
     if (!await Directory(
             '/storage/emulated/0/Android/media/com.whatsapp/Whatsapp/Media/.Statuses/')
@@ -63,9 +101,9 @@ class _StatusesPageState extends State<StatusesPage> {
     } else if (!isPermissionGranted!) {
       return GestureDetector(
         onTap: () async {
-          PermissionStatus permissionStatus =
-              await Permission.manageExternalStorage.request();
-          if (permissionStatus == PermissionStatus.granted) {
+          PermissionStatus permissionGranted =
+              await _permissions.requestPermission();
+          if (permissionGranted == PermissionStatus.granted) {
             await _init();
           }
         },
