@@ -6,11 +6,12 @@ import 'package:whatskit/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Application());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+// main app
+class Application extends StatelessWidget {
+  const Application({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       builder: (context, _) {
         final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Whatskit',
           themeMode: themeProvider.getThemeMode,
           theme: AppThemes.lightTheme,
           darkTheme: AppThemes.darkTheme,
@@ -88,19 +89,4 @@ class _AppState extends State<App> {
       ),
     );
   }
-}
-
-MaterialColor generateMaterialColorFromColor(Color color) {
-  return MaterialColor(color.value, {
-    50: Color.fromRGBO(color.red, color.green, color.blue, 0.1),
-    100: Color.fromRGBO(color.red, color.green, color.blue, 0.2),
-    200: Color.fromRGBO(color.red, color.green, color.blue, 0.3),
-    300: Color.fromRGBO(color.red, color.green, color.blue, 0.4),
-    400: Color.fromRGBO(color.red, color.green, color.blue, 0.5),
-    500: Color.fromRGBO(color.red, color.green, color.blue, 0.6),
-    600: Color.fromRGBO(color.red, color.green, color.blue, 0.7),
-    700: Color.fromRGBO(color.red, color.green, color.blue, 0.8),
-    800: Color.fromRGBO(color.red, color.green, color.blue, 0.9),
-    900: Color.fromRGBO(color.red, color.green, color.blue, 1.0),
-  });
 }

@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
+/// shows the trimmed version of a video
+/// also users can manually trim the video and share it individually
 class TrimmedVideoPage extends StatefulWidget {
+  /// the position which the trim starts
   final Duration start;
+
+  /// the position which the trim ends
   final Duration end;
+
+  /// video file we are trimming
   final File video;
   const TrimmedVideoPage({
     Key? key,
@@ -19,9 +26,16 @@ class TrimmedVideoPage extends StatefulWidget {
 }
 
 class _TrimmedVideoPageState extends State<TrimmedVideoPage> {
+  /// trimmer controller
   Trimmer? _trimmer;
+
+  /// whether the video is being played or not
   bool? _isPlaying;
+
+  /// the starting position of the trim in milliseconds
   double? _trimStart;
+
+  /// the ending position of the trim in milliseconds
   double? _trimEnd;
 
   @override
@@ -30,6 +44,7 @@ class _TrimmedVideoPageState extends State<TrimmedVideoPage> {
     super.initState();
   }
 
+  /// async init function of the class
   Future<void> _init() async {
     _trimmer = Trimmer();
     await _trimmer!.loadVideo(videoFile: widget.video);
@@ -162,9 +177,15 @@ class _TrimmedVideoPageState extends State<TrimmedVideoPage> {
   }
 }
 
+/// indicating the position of the video
 class TrimmerPosIndicator extends StatefulWidget {
+  /// the trimmer controller
   final Trimmer trimmer;
+
+  /// the starting position of the trim in milliseconds
   final double trimStart;
+
+  /// the ending position of the trim in milliseconds
   final double trimEnd;
   const TrimmerPosIndicator({
     Key? key,
@@ -178,8 +199,14 @@ class TrimmerPosIndicator extends StatefulWidget {
 }
 
 class _TrimmerPosIndicatorState extends State<TrimmerPosIndicator> {
+  /// minimum value of the slider
   double min = 0;
+
+  /// maximum value of the slider
   double max = 100;
+
+  /// the current value of the slider
+  /// position of the video
   double position = 0;
 
   void _update() {

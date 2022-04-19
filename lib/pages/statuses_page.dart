@@ -4,14 +4,18 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:whatskit/widgets/status_card.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
-class Permissions {
+/// this is like a middleware
+/// different android versions use different type of permissions for the same thing
+/// in this case android 11 needs the manageExternalStorage permission to work
+class _Permissions {
   late AndroidDeviceInfo _androidDeviceInfo;
   int? androidVersion;
 
-  Permissions() {
+  _Permissions() {
     _init();
   }
 
+  /// returns ```true``` if the permission is granted
   Future<bool> get isGranted async {
     if (androidVersion == null) {
       _androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
@@ -24,6 +28,7 @@ class Permissions {
     }
   }
 
+  /// requests permissions if they have not been granted
   Future<PermissionStatus> requestIfNotFound() async {
     if (await isGranted == false) {
       return await requestPermission();
@@ -32,10 +37,12 @@ class Permissions {
     }
   }
 
+  /// requests permissions
   Future<PermissionStatus> requestPermission() async {
     return await Permission.manageExternalStorage.request();
   }
 
+  /// async init function of the class
   Future<void> _init() async {
     _androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
     androidVersion = int.parse(_androidDeviceInfo.version.release ?? '0');
@@ -43,6 +50,7 @@ class Permissions {
   }
 }
 
+/// page that shows the statuses
 class StatusesPage extends StatefulWidget {
   const StatusesPage({Key? key}) : super(key: key);
 
@@ -53,13 +61,18 @@ class StatusesPage extends StatefulWidget {
 class _StatusesPageState extends State<StatusesPage> {
   bool? isWhatsappInstalled;
   bool? isPermissionGranted;
-  List<FileSystemEntity> _statusFiles = [];
-  final Permissions _permissions = Permissions();
 
+  /// list of statuses
+  List<FileSystemEntity> _statusFiles = [];
+  final _Permissions _permissions = _Permissions();
+
+  // returns a list of Status files from the statuses dir
   Future<List<FileSystemEntity>> getFileList() async {
+    /// dir that has all the statuses
     Directory dir = Directory(
         '/storage/emulated/0/Android/media/com.whatsapp/Whatsapp/Media/.Statuses/');
     List<FileSystemEntity> fileList = await dir.list(recursive: false).toList();
+    // we only wants the media files
     return fileList.where((element) {
       return element.path.endsWith('.mp4') || element.path.endsWith('.jpg');
     }).toList();
@@ -95,10 +108,13 @@ class _StatusesPageState extends State<StatusesPage> {
   @override
   Widget build(BuildContext context) {
     if (isWhatsappInstalled == null || isPermissionGranted == null) {
+      // showing a loading circle while everything is verifying
       return const Center(
         child: CircularProgressIndicator(),
       );
     } else if (!isPermissionGranted!) {
+      // if we dont have the permission
+      // we display a screen so the user can grant it
       return GestureDetector(
         onTap: () async {
           PermissionStatus permissionGranted =
@@ -134,6 +150,7 @@ class _StatusesPageState extends State<StatusesPage> {
         ),
       );
     } else if (isWhatsappInstalled == false) {
+      // the screen that we show if the whatsapp isn't installed
       return Scaffold(
         body: Center(
           child: Column(
@@ -154,12 +171,14 @@ class _StatusesPageState extends State<StatusesPage> {
         ),
       );
     } else {
+      // if every thing is oky we show the page
       return Scaffold(
         body: RefreshIndicator(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           onRefresh: _init,
           child: _statusFiles.isEmpty
               ? Column(
+                  // when there are no statuses
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(

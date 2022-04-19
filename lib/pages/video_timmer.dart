@@ -6,6 +6,7 @@ import 'package:video_player/video_player.dart';
 import 'package:whatskit/pages/trimmed_video_page.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
+/// the page where you can see the parts of trimmed videos
 class VideoTrimmerPage extends StatefulWidget {
   const VideoTrimmerPage({Key? key}) : super(key: key);
 
@@ -14,7 +15,10 @@ class VideoTrimmerPage extends StatefulWidget {
 }
 
 class _VideoTrimmerPageState extends State<VideoTrimmerPage> {
+  /// to pick the video file
   final ImagePicker _picker = ImagePicker();
+
+  /// video file we are trimming
   XFile? _video;
 
   @override
@@ -62,31 +66,48 @@ class _VideoTrimmerPageState extends State<VideoTrimmerPage> {
     }
 
     return SafeArea(
-      child: TrimPreviews(
+      child: _TrimPreviews(
         video: File(_video!.path),
       ),
     );
   }
 }
 
-class TrimPreviews extends StatefulWidget {
+/// previews of the autoMatically trimmed trims
+class _TrimPreviews extends StatefulWidget {
   final File video;
-  const TrimPreviews({Key? key, required this.video}) : super(key: key);
+  const _TrimPreviews({Key? key, required this.video}) : super(key: key);
 
   @override
-  State<TrimPreviews> createState() => _TrimPreviewsState();
+  State<_TrimPreviews> createState() => _TrimPreviewsState();
 }
 
+/// sharingState of trims
+///  - none : nothing is going on
+///  - rendering : rendering the clips
+///  - sharing : sharing the clips
 enum SharingState {
+  /// nothing is happening
   none,
+
+  /// sharing state is rendering
   rendering,
+
+  /// sharing the rendered clips
   sharing,
 }
 
-class _TrimPreviewsState extends State<TrimPreviews> {
+class _TrimPreviewsState extends State<_TrimPreviews> {
+  /// full duration of the video
   Duration? _fullVidDuration;
+
+  /// trimmed videos clips of the full video
   List<Map<String, Duration>>? _trimmedVids;
+
+  /// list of paths of exported clips
   List<String>? _exportedVids;
+
+  /// sharing state of the clips
   SharingState _sharingState = SharingState.none;
 
   @override
@@ -100,6 +121,7 @@ class _TrimPreviewsState extends State<TrimPreviews> {
   }
 
   Future<void> _init() async {
+    // getting the data of the video
     VideoPlayerController _vidPlayController =
         VideoPlayerController.file(widget.video);
     await _vidPlayController.initialize();
@@ -107,12 +129,17 @@ class _TrimPreviewsState extends State<TrimPreviews> {
     await _vidPlayController.dispose();
   }
 
+  /// get the list of starting and ending positions of trimmed videos
+  /// this will use 30 seconds as clips
   List<Map<String, Duration>> _getTrimmedVideos() {
+    /// list of trimmed video clips to be returned
     List<Map<String, Duration>> _trimmedVideos = [];
     for (int i = 0; i < _fullVidDuration!.inSeconds; i += 30) {
       _trimmedVideos.add({
         'start': Duration(seconds: i),
         'end': Duration(
+          // if the last clip ending point is longer than the video duration we use the videoDuration as the ending position
+          // ex : last trim -- 30 seconds to 60 seconds but the video is only 58 seconds long
           seconds: i + 30 > _fullVidDuration!.inSeconds
               ? _fullVidDuration!.inSeconds
               : i + 30,
@@ -125,6 +152,7 @@ class _TrimPreviewsState extends State<TrimPreviews> {
   @override
   Widget build(BuildContext context) {
     if (_trimmedVids == null) {
+      // if videos havent trimmed yet
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
@@ -225,7 +253,6 @@ class _TrimPreviewsState extends State<TrimPreviews> {
               TrimmedVidCard(
                 start: _trimmedVids![i]['start']!,
                 end: _trimmedVids![i]['end']!,
-                duration: _fullVidDuration!,
                 video: widget.video,
               ),
           ],
@@ -257,16 +284,20 @@ class _TrimPreviewsState extends State<TrimPreviews> {
   }
 }
 
+/// video card that shows the starting and ending position of the video
 class TrimmedVidCard extends StatelessWidget {
+  /// starting position of the clip
   final Duration start;
+
+  /// ending position of the clip
   final Duration end;
-  final Duration duration;
+
+  /// video file
   final File video;
   const TrimmedVidCard({
     Key? key,
     required this.start,
     required this.end,
-    required this.duration,
     required this.video,
   }) : super(key: key);
 

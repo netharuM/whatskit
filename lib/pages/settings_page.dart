@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatskit/provider/theme_provider.dart';
 
+/// settings page of the app
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
@@ -64,6 +65,7 @@ class _SettingsPageState extends State<SettingsPage> {
             iconColor: Colors.pink,
             icon: Icons.cleaning_services_rounded,
             onTap: () async {
+              // clearing the rendered cache if the user forgot to clear the saved cache
               var renderedCacheDir = Directory(
                   '/storage/emulated/0/Android/data/com.netharuM.whatskit/files/Trimmer');
               if (await renderedCacheDir.exists()) {
@@ -114,6 +116,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
+/// the widget that shows a settings option
 class SettingsOption extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -177,6 +180,7 @@ class SettingsOption extends StatelessWidget {
   }
 }
 
+/// about the app page
 class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
 
@@ -333,6 +337,7 @@ class _AboutPageState extends State<AboutPage> {
   }
 }
 
+/// showing an option about the app
 class AboutCard extends StatelessWidget {
   final String? title;
   final String? subtitle;

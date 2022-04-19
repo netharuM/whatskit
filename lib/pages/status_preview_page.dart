@@ -4,15 +4,16 @@ import 'package:video_player/video_player.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 
-class PreviewPage extends StatefulWidget {
+/// the page that shows the preview of the status
+class StatusPreviewPage extends StatefulWidget {
   final File file;
-  const PreviewPage({Key? key, required this.file}) : super(key: key);
+  const StatusPreviewPage({Key? key, required this.file}) : super(key: key);
 
   @override
-  State<PreviewPage> createState() => _PreviewPageState();
+  State<StatusPreviewPage> createState() => _StatusPreviewPageState();
 }
 
-class _PreviewPageState extends State<PreviewPage> {
+class _StatusPreviewPageState extends State<StatusPreviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +22,7 @@ class _PreviewPageState extends State<PreviewPage> {
         child: Builder(
           builder: (context) {
             if (widget.file.path.endsWith('.mp4')) {
+              // if the media file is a video
               return Column(
                 children: [
                   StatusPlayer(
@@ -67,6 +69,7 @@ class _PreviewPageState extends State<PreviewPage> {
                 ],
               );
             } else if (widget.file.path.endsWith('.jpg')) {
+              // or if its a picture
               return Stack(
                 children: [
                   Center(
@@ -87,6 +90,7 @@ class _PreviewPageState extends State<PreviewPage> {
                           children: [
                             TextButton(
                               onPressed: () {
+                                // sharing the status
                                 Share.shareFiles(
                                   [widget.file.path],
                                 );
@@ -95,6 +99,7 @@ class _PreviewPageState extends State<PreviewPage> {
                             ),
                             TextButton(
                               onPressed: () async {
+                                // copying the status to another directory
                                 String? path = await FilesystemPicker.open(
                                   title: 'Save to folder',
                                   context: context,
@@ -135,6 +140,7 @@ class _PreviewPageState extends State<PreviewPage> {
   }
 }
 
+/// this plays the status
 class StatusPlayer extends StatefulWidget {
   final File file;
   const StatusPlayer({Key? key, required this.file}) : super(key: key);
@@ -216,6 +222,8 @@ class _StatusPlayerState extends State<StatusPlayer> {
   }
 }
 
+/// this shows the position of the video
+/// and also you can seek to a specific position
 class PlayerPosIndicator extends StatefulWidget {
   final VideoPlayerController controller;
   const PlayerPosIndicator({Key? key, required this.controller})

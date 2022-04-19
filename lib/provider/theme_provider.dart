@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// providing the theme mode
 class ThemeProvider extends ChangeNotifier {
   ThemeProvider() {
     _init();
   }
 
-  ThemeMode themeMode = ThemeMode.system;
+  /// the theme mode
+  ThemeMode _themeMode = ThemeMode.system; // theme by default
   late final SharedPreferences _prefs;
 
   void _init() async {
@@ -19,6 +21,7 @@ class ThemeProvider extends ChangeNotifier {
     }
   }
 
+  /// sets the theme mode from a string
   void fromString(String themeModeStr) {
     assert(
       themeModeStr == 'system' ||
@@ -28,22 +31,24 @@ class ThemeProvider extends ChangeNotifier {
     );
     switch (themeModeStr) {
       case 'system':
-        themeMode = ThemeMode.system;
+        _themeMode = ThemeMode.system;
         break;
       case 'light':
-        themeMode = ThemeMode.light;
+        _themeMode = ThemeMode.light;
         break;
       case 'dark':
-        themeMode = ThemeMode.dark;
+        _themeMode = ThemeMode.dark;
         break;
     }
     _prefs.setString('themeMode', themeModeStr);
     notifyListeners();
   }
 
+  /// converts the theme mode to a string
+  /// usefull when saving the theme
   @override
   String toString() {
-    switch (themeMode) {
+    switch (_themeMode) {
       case ThemeMode.system:
         return 'system';
       case ThemeMode.light:
@@ -53,9 +58,12 @@ class ThemeProvider extends ChangeNotifier {
     }
   }
 
-  ThemeMode get getThemeMode => themeMode;
+  /// returns the current theme mode
+  ThemeMode get getThemeMode => _themeMode;
+
+  /// sets the theme mode
   void changeThemeMode(ThemeMode theme) {
-    themeMode = theme;
+    _themeMode = theme;
     _prefs.setString('themeMode', toString());
     notifyListeners();
   }
@@ -120,6 +128,7 @@ class AppThemes {
   );
 }
 
+/// generates a [MaterialColor] from a [Color]
 MaterialColor generateMaterialColorFromColor(Color color) {
   return MaterialColor(color.value, {
     50: Color.fromRGBO(color.red, color.green, color.blue, 0.1),

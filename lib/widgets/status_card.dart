@@ -4,6 +4,7 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:flutter/material.dart';
 import 'package:whatskit/pages/status_preview_page.dart';
 
+/// shows the Status as card that user can click on
 class WhatsappStatusCard extends StatelessWidget {
   final FileSystemEntity file;
   final double elevation;
@@ -35,7 +36,7 @@ class WhatsappStatusCard extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (builder) => PreviewPage(
+                      builder: (builder) => StatusPreviewPage(
                         file: File(file.path),
                       ),
                     ),
