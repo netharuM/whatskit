@@ -63,7 +63,7 @@ class _StatusesPageState extends State<StatusesPage> {
   bool? isPermissionGranted;
 
   /// list of statuses
-  List<FileSystemEntity> _statusFiles = [];
+  List<FileSystemEntity>? _statusFiles;
   final _Permissions _permissions = _Permissions();
 
   // returns a list of Status files from the statuses dir
@@ -107,7 +107,9 @@ class _StatusesPageState extends State<StatusesPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isWhatsappInstalled == null || isPermissionGranted == null) {
+    if (isWhatsappInstalled == null ||
+        isPermissionGranted == null ||
+        _statusFiles == null) {
       // showing a loading circle while everything is verifying
       return const Center(
         child: CircularProgressIndicator(),
@@ -176,7 +178,7 @@ class _StatusesPageState extends State<StatusesPage> {
         body: RefreshIndicator(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           onRefresh: _init,
-          child: _statusFiles.isEmpty
+          child: _statusFiles!.isEmpty
               ? Column(
                   // when there are no statuses
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -193,12 +195,12 @@ class _StatusesPageState extends State<StatusesPage> {
               : GridView.count(
                   crossAxisCount: 2,
                   children: [
-                    for (int i = 0; i < _statusFiles.length; i++)
+                    for (int i = 0; i < _statusFiles!.length; i++)
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: WhatsappStatusCard(
                           elevation: 10,
-                          file: _statusFiles[i],
+                          file: _statusFiles![i],
                         ),
                       ),
                   ],
