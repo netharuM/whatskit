@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:video_player/video_player.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -41,22 +42,13 @@ class _StatusPreviewPageState extends State<StatusPreviewPage> {
                       ),
                       TextButton(
                         onPressed: () async {
-                          String? path = await FilesystemPicker.open(
-                            title: 'Save to folder',
+                          showSaveAsDialog(
                             context: context,
-                            rootDirectory: Directory(
-                              '/storage/emulated/0/',
-                            ),
-                            fsType: FilesystemType.folder,
-                            pickText: 'Save file to this folder',
-                            folderIconColor: Colors.teal,
+                            statusFile: widget.file,
+                            statusType: StatusType.video,
                           );
-                          if (path != null) {
-                            await widget.file.copy(
-                                '$path/${widget.file.path.split('/').last}');
-                          }
                         },
-                        child: const Icon(Icons.download),
+                        child: const Icon(Icons.save_alt_rounded),
                       ),
                       TextButton(
                         onPressed: () {
@@ -99,23 +91,13 @@ class _StatusPreviewPageState extends State<StatusPreviewPage> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                // copying the status to another directory
-                                String? path = await FilesystemPicker.open(
-                                  title: 'Save to folder',
+                                showSaveAsDialog(
                                   context: context,
-                                  rootDirectory: Directory(
-                                    '/storage/emulated/0/',
-                                  ),
-                                  fsType: FilesystemType.folder,
-                                  pickText: 'Save file to this folder',
-                                  folderIconColor: Colors.teal,
+                                  statusFile: widget.file,
+                                  statusType: StatusType.image,
                                 );
-                                if (path != null) {
-                                  await widget.file.copy(
-                                      '$path/${widget.file.path.split('/').last}');
-                                }
                               },
-                              child: const Icon(Icons.download),
+                              child: const Icon(Icons.save_alt_rounded),
                             ),
                             TextButton(
                               onPressed: () {
@@ -235,11 +217,17 @@ class PlayerPosIndicator extends StatefulWidget {
 
 class _PlayerPosIndicatorState extends State<PlayerPosIndicator> {
   double position = 0;
+  double max = 0;
 
   void _update() {
-    setState(() {
-      position = widget.controller.value.position.inMilliseconds.toDouble();
-    });
+    int val = widget.controller.value.position.inMilliseconds.toInt();
+    int maxVal = widget.controller.value.duration.inMilliseconds.toInt();
+    if (val >= 0 && val <= maxVal) {
+      setState(() {
+        position = val.toDouble();
+        max = maxVal.toDouble();
+      });
+    }
   }
 
   @override
@@ -261,10 +249,130 @@ class _PlayerPosIndicatorState extends State<PlayerPosIndicator> {
       child: Slider(
         value: position,
         min: 0,
-        max: widget.controller.value.duration.inMilliseconds.toDouble(),
+        max: max,
         onChanged: (double value) {
           widget.controller.seekTo(Duration(milliseconds: value.toInt()));
         },
+      ),
+    );
+  }
+}
+
+enum StatusType {
+  image,
+  video,
+}
+
+Future<T> showSaveAsDialog<T>({
+  required BuildContext context,
+  required File statusFile,
+  required StatusType statusType,
+}) async {
+  return await showDialog(
+    context: context,
+    builder: (BuildContext context) => SaveAsPopup(
+      statusFile: statusFile,
+      statusType: statusType,
+    ),
+  );
+}
+
+class SaveAsPopup extends StatelessWidget {
+  final File statusFile;
+  final StatusType statusType;
+  const SaveAsPopup({
+    Key? key,
+    required this.statusFile,
+    required this.statusType,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            margin: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: const [
+                    Text(
+                      'Save to ',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    Icon(Icons.save_alt),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        if (statusType == StatusType.image) {
+                          await GallerySaver.saveImage(statusFile.path);
+                        } else {
+                          await GallerySaver.saveVideo(statusFile.path);
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Saved the statuses'),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.photo_sharp),
+                      label: const Text('Gallery'),
+                      style: ElevatedButton.styleFrom(
+                        shape: const StadiumBorder(),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        String? path = await FilesystemPicker.open(
+                          title: 'Save to folder',
+                          context: context,
+                          rootDirectory: Directory(
+                            '/storage/emulated/0/',
+                          ),
+                          fsType: FilesystemType.folder,
+                          pickText: 'Save file to this folder',
+                          folderIconColor: Colors.teal,
+                        );
+                        if (path != null) {
+                          Navigator.pop(context);
+                          await statusFile.copy(
+                            '$path/${statusFile.path.split('/').last}',
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Saved the statuses'),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.folder_sharp),
+                      label: const Text('Folder'),
+                      style: ElevatedButton.styleFrom(
+                        shape: const StadiumBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

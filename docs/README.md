@@ -38,7 +38,7 @@ images
   - ![sharing page](./assets/sharing.png)
 
 - settings page
-  - with an option to clear the rendered cache incase you forogot to clear it
+  - with an option to clear the rendered cache incase you forgot to clear it
   - and themes
     - dark theme
       - ![dark theme settings page](./assets/settings_dark.png)
